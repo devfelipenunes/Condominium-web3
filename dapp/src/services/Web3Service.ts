@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import ABI from "./ABI.json";
-// import { doApiLogin } from "./ApiService";
+import { doApiLogin } from "./ApiService";
 
 const ADAPTER_ADDRESS = `${process.env.REACT_APP_ADAPTER_ADDRESS}`;
 
@@ -78,7 +78,10 @@ export async function doLogin(): Promise<LoginResult> {
   if (!accounts || !accounts.length)
     throw new Error("Wallet not found/allowed.");
 
+  console.log("Account", accounts[0]);
+
   const contract = getContract(provider);
+  console.log("Contract", contract);
 
   const resident = (await contract.getResident(accounts[0])) as Resident;
   let isManager = resident.isManager;
@@ -98,16 +101,16 @@ export async function doLogin(): Promise<LoginResult> {
 
   localStorage.setItem("account", accounts[0]);
 
-  // const signer = await provider.getSigner();
-  // const timestamp = Date.now();
-  // const message = `Authenticating to Condominium. Timestamp: ${timestamp}`;
-  // const secret = await signer.signMessage(message);
+  const signer = await provider.getSigner();
+  const timestamp = Date.now();
+  const message = `Authenticating to Condominium. Timestamp: ${timestamp}`;
+  const secret = await signer.signMessage(message);
 
-  // const token = await doApiLogin(accounts[0], secret, timestamp);
-  // localStorage.setItem("token", token);
+  const token = await doApiLogin(accounts[0], secret, timestamp);
+  localStorage.setItem("token", token);
 
   return {
-    // token,
+    token,
     account: accounts[0],
     profile: parseInt(localStorage.getItem("profile") || "0"),
   } as LoginResult;
